@@ -38,6 +38,7 @@ func getTestServer(pkh string) *Server {
 		}},
 		filter: OperationFilter{
 			EnableTx: false,
+			TxMaxFee: big.NewInt(-1),
 		},
 		watermark: watermark.GetSessionWatermark(),
 	}

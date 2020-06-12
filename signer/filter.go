@@ -14,6 +14,7 @@ type OperationFilter struct {
 	EnableVoting         bool
 	TxWhitelistAddresses []string
 	TxDailyMax           *big.Int
+	TxMaxFee             *big.Int
 
 	// Keep track of daily max withdrawals
 	dailyTxMaxKey     string
@@ -27,6 +28,15 @@ func (filter *OperationFilter) IsAllowed(op *Operation) bool {
 		return true
 	case opMagicByteGeneric:
 		generic := GetGenericOperation(op)
+
+		// Enforce max fees if TxMaxFee is >= 0
+		if filter.TxMaxFee.Cmp(big.NewInt(0)) >= 0 {
+			// Single transaction fee must not exceed the
+			if generic.TransactionFee().Cmp(filter.TxMaxFee) == 1 {
+				return false
+			}
+		}
+
 		if filter.EnableGeneric {
 			return true
 		}

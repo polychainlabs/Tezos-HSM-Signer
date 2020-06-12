@@ -4,7 +4,6 @@ import (
 	"flag"
 	"io/ioutil"
 	"log"
-	"math/big"
 	"strings"
 
 	"gitlab.com/polychainlabs/tezos-hsm-signer/signer"
@@ -22,6 +21,7 @@ var (
 	enableVoting         = flag.Bool("enable-voting", false, "Enable voting proposals and ballots")
 	txWhitelistAddresses = flag.String("tx-whitelist-addresses", "", "Comma delimited list of tz addresses that transfers are enabled to")
 	txDailyMax           = flag.String("tx-daily-max", "", "Max amount of XTZ that can be transferred in a 24 hour period")
+	txMaxFee             = flag.String("tx-max-fee", "-1", "Max fee that can be sent with any transaction")
 	// HSM Flags
 	hsmPin     = flag.String("hsm-pin", "", "User PIN to log into the HSM")
 	hsmPinFile = flag.String("hsm-pin-file", "", "Text file containing the user PIN to log into the HSM")
@@ -71,11 +71,10 @@ func main() {
 		EnableGeneric: *enableGeneric,
 		EnableTx:      *enableTx,
 		EnableVoting:  *enableVoting,
+		TxMaxFee:      signer.ParseUXTZ(*txMaxFee),
 	}
 	if len(*txDailyMax) > 0 {
-		opFilter.TxDailyMax, _ = new(big.Int).SetString(*txDailyMax, 10)
-		// Convert from XTZ to uXTZ
-		opFilter.TxDailyMax.Mul(opFilter.TxDailyMax, new(big.Int).SetInt64(1000000))
+		opFilter.TxDailyMax = signer.ParseUXTZ(*txDailyMax)
 	}
 	if len(*txWhitelistAddresses) > 0 {
 		opFilter.TxWhitelistAddresses = strings.Split(*txWhitelistAddresses, ",")

@@ -24,6 +24,7 @@ tezos-hsm-signer \
     --enable-voting \
     --enable-tx \
     --tx-daily-max 500 \
+    --tx-max-fee 10 \
     --tx-whitelist-addresses "tz1...,tz2..." \
     --key-file "./keys.yaml"
 ```
